@@ -1,0 +1,45 @@
+workflows:
+  weather-apk:
+    name: Magic Ball APK
+    max_build_duration: 30
+    environment:
+      node: 22
+      java: 21
+    scripts:
+      # 1. Устанавливаем зависимости
+      - name: Install dependencies
+        script: |
+          npm install
+          npm install -g @capacitor/cli
+          npm install @capacitor/android
+
+      # 2. Создаем Android проект
+      - name: Sync Android
+        script: |
+          rm -rf android
+          npx cap add android
+          npx cap sync android
+
+      # 3. Скачиваем и ставим фиолетовую иконку с буквой "А"
+      - name: Setup Custom Icon
+        script: |
+          mkdir -p assets
+          # Скачиваем иконку (Фиолетовый фон #6B21A8, белая буква A)
+          curl -L "https://ui-avatars.com/api/?name=A&background=6B21A8&color=fff&size=512&bold=true" -o assets/icon.png
+          
+          # Копируем иконку во все папки Android
+          for size in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            mkdir -p android/app/src/main/res/mipmap-$size
+            cp assets/icon.png android/app/src/main/res/mipmap-$size/ic_launcher.png
+          done
+          echo "✅ Фиолетовая иконка 'A' установлена!"
+
+      # 4. Собираем приложение
+      - name: Build Debug APK
+        script: |
+          cd android
+          chmod +x ./gradlew
+          export JAVA_HOME=$JAVA_HOME_21_X64
+          ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/apk/debug/*.apk
