@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Магический Шар</title>
     <style>
-        /* Сброс стилей */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* Темный мистический фон */
         body {
             background: radial-gradient(circle at center, #2b1055, #000000);
             height: 100vh;
@@ -20,63 +17,24 @@
             color: white;
             overflow: hidden;
         }
-
-        h1 {
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #a855f7;
-            font-size: 24px;
-            opacity: 0.8;
-        }
-
-        /* Сам Шар */
+        h1 { margin-bottom: 20px; text-shadow: 0 0 10px #a855f7; font-size: 24px; opacity: 0.8; }
         .ball {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
+            width: 300px; height: 300px; border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #444, #000);
             box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 -10px 20px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.1s;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; position: relative;
         }
-
-        /* Внутреннее окошко с ответом */
         .window {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             background: radial-gradient(circle, #1e3a8a, #0f172a);
             border: 4px solid #334155;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #fff;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 15px;
-            box-shadow: inset 0 0 20px #000;
-            text-shadow: 0 0 5px #fff;
+            display: flex; justify-content: center; align-items: center;
+            text-align: center; color: #fff; font-size: 18px; font-weight: bold;
+            padding: 15px; box-shadow: inset 0 0 20px #000; text-shadow: 0 0 5px #fff;
         }
-
-        /* Подсказка внизу */
-        .hint {
-            margin-top: 30px;
-            color: #94a3b8;
-            font-size: 14px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-
-        /* Анимация тряски */
+        .hint { margin-top: 30px; color: #94a3b8; font-size: 14px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         @keyframes shake {
             0% { transform: translate(1px, 1px) rotate(0deg); }
             10% { transform: translate(-1px, -2px) rotate(-1deg); }
@@ -90,27 +48,16 @@
             90% { transform: translate(1px, 2px) rotate(0deg); }
             100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
-
-        .shaking {
-            animation: shake 0.5s;
-            animation-iteration-count: 2; /* Трясется 1 секунду */
-        }
+        .shaking { animation: shake 0.5s; animation-iteration-count: 2; }
     </style>
 </head>
 <body>
-
     <h1>🔮 Магический Шар Судьбы</h1>
-    
     <div class="ball" onclick="predict()">
-        <div class="window" id="answer">
-            <span style="font-size: 40px;">?</span>
-        </div>
+        <div class="window" id="answer"><span style="font-size: 40px;">?</span></div>
     </div>
-
     <div class="hint">Нажми на шар, чтобы узнать судьбу</div>
-
     <script>
-        // Ответы шара
         const answers = [
             "Бесспорно!", "Это определённо так.", "Никаких сомнений.", "Можешь быть уверен.",
             "Наверняка.", "Хорошие перспективы.", "Знаки говорят — да.", "Да.",
@@ -119,37 +66,21 @@
             "Даже не думай.", "Мой ответ — нет.", "По моим данным — нет.",
             "Перспективы не очень.", "Весьма сомнительно.", "Звёзды молчат."
         ];
-
         const ball = document.querySelector('.ball');
         const answerBox = document.getElementById('answer');
         let isShaking = false;
-
         function predict() {
-            // Если шар уже трясется — ничего не делаем
             if (isShaking) return;
             isShaking = true;
-
-            // 1. Включаем анимацию тряски
             ball.classList.add('shaking');
-            
-            // 2. Скрываем старый ответ, показываем туман
             answerBox.style.opacity = '0.3';
             answerBox.innerHTML = '<span style="font-size: 40px;">...</span>';
-
-            // 3. Вибрация телефона (если поддерживается)
-            if (navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]);
-            }
-
-            // 4. Через 1 секунду показываем ответ
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
             setTimeout(() => {
                 ball.classList.remove('shaking');
-                
-                // Выбираем случайный ответ
                 const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
                 answerBox.textContent = randomAnswer;
                 answerBox.style.opacity = '1';
-                
                 isShaking = false;
             }, 1000);
         }
