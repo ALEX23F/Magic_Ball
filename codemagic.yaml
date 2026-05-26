@@ -18,9 +18,21 @@ workflows:
           npx cap add android
           npx cap sync android
 
-          # 2. Скачиваем фиолетовую иконку
+          # 2. ГЕНЕРИРУЕМ ИДЕАЛЬНЫЙ ФИОЛЕТОВЫЙ ШАР-8 (БЕЗ ИНТЕРНЕТА)
           mkdir -p assets
-          curl -L "https://ui-avatars.com/api/?name=A&background=6B21A8&color=fff&size=512&bold=true" -o assets/icon.png
+          
+          # Создаем базовый фиолетовый круглый щит 512x512
+          convert -size 512x512 xc:none -fill "#4B0082" -draw "circle 256,256 256,10" assets/icon.png
+          
+          # Накладываем сверху белый круг поменьше под цифру
+          convert assets/icon.png -fill "#FFFFFF" -draw "circle 256,256 256,120" assets/icon.png
+          
+          # Вписываем по центру черную магическую восьмерку
+          convert assets/icon.png -fill "#000000" -pointsize 160 -font Helvetica-Bold -gravity center -draw "text 0,0 '8'" assets/icon.png
+          
+          # Дублируем получившийся идеальный шар под форматы Capacitor
+          cp assets/icon.png assets/icon-only.png
+          cp assets/icon.png assets/icon-background.png
 
           # 3. Удаляем папку с адаптивными XML-роботами, чтобы они не мешали PNG-иконкам
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
@@ -33,12 +45,12 @@ workflows:
             cp assets/icon.png android/app/src/main/res/$dir/ic_launcher_round.png
           done
 
-          # 5. ИСПРАВЛЕНИЕ: Переключаем AndroidManifest на использование обычных PNG-иконок вместо XML
+          # 5. Переключаем AndroidManifest на использование обычных PNG-иконок вместо XML
           MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
           sed -i '' 's/android:icon="@mipmap\/ic_launcher"/android:icon="@mipmap\/ic_launcher"/g' $MANIFEST_PATH 2>/dev/null || sed -i 's/android:icon="@mipmap\/ic_launcher"/android:icon="@mipmap\/ic_launcher"/g' $MANIFEST_PATH
           sed -i '' 's/android:roundIcon="@mipmap\/ic_launcher_round"/android:roundIcon="@mipmap\/ic_launcher_round"/g' $MANIFEST_PATH 2>/dev/null || sed -i 's/android:roundIcon="@mipmap\/ic_launcher_round"/android:roundIcon="@mipmap\/ic_launcher_round"/g' $MANIFEST_PATH
 
-          echo "✅ Фиолетовая иконка успешно настроена и манифест обновлен!"
+          echo "✅ Фиолетовый шар-8 успешно сгенерирован и установлен!"
       - name: Build Debug APK
         script: |
           cd android
