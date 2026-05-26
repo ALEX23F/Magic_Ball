@@ -9,27 +9,22 @@ workflows:
       - name: Install dependencies
         script: |
           npm install
-          npm install -g @capacitor/cli @capacitor/assets
+          npm install -g @capacitor/cli
           npm install @capacitor/android
-      - name: Generate Assets and Sync Android
+      - name: Sync Android
         script: |
-          # 1. Создаем временную папку для исходника иконки
-          mkdir -p assets
-          curl -L "https://ui-avatars.com/api/?name=A&background=6B21A8&color=fff&size=512&bold=true" -o assets/icon-only.png
-          
-          # Для работы @capacitor/assets нужен также файл icon.png (или splash.png) в корне или в assets
-          cp assets/icon-only.png assets/icon.png
-
-          # 2. Пересоздаем андроид-проект
           rm -rf android
           npx cap add android
-          
-          # 3. Автоматически генерируем ВСЕ форматы иконок (включая адаптивные) прямо в проект
-          npx capacitor-assets generate --android
-          
-          # 4. Синхронизируем проект
           npx cap sync android
-          echo "✅ Фиолетовая иконка 'A' сгенерирована во всех Android-форматах!"
+      - name: Setup Custom Icon
+        script: |
+          mkdir -p assets
+          curl -L "https://ui-avatars.com/api/?name=A&background=6B21A8&color=fff&size=512&bold=true" -o assets/icon.png
+          for size in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            mkdir -p android/app/src/main/res/mipmap-$size
+            cp assets/icon.png android/app/src/main/res/mipmap-$size/ic_launcher.png
+          done
+          echo "✅ Фиолетовая иконка 'A' установлена!"
       - name: Build Debug APK
         script: |
           cd android
