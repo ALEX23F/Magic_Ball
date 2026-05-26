@@ -9,25 +9,36 @@ workflows:
       - name: Install dependencies
         script: |
           npm install
-          npm install -g @capacitor/cli @capacitor/assets
+          npm install -g @capacitor/cli
           npm install @capacitor/android
-      - name: Generate Assets and Sync Android
+      - name: Sync Android and Apply Purple Icon
         script: |
-          # 1. Создаем временную папку для исходника иконки
-          mkdir -p assets
-          curl -L "https://ui-avatars.com/api/?name=A&background=6B21A8&color=fff&size=512&bold=true" -o assets/icon-only.png
-          cp assets/icon-only.png assets/icon.png
-
-          # 2. Пересоздаем андроид-проект
+          # 1. Пересоздаем андроид-проект с нуля
           rm -rf android
           npx cap add android
-          
-          # 3. Автоматически генерируем форматы иконок
-          npx capacitor-assets generate --android --icon
-          
-          # 4. Синхронизируем готовую папку www с Android-проектом
           npx cap sync android
-          echo "✅ Фиолетовая иконка 'A' сгенерирована во всех Android-форматах!"
+
+          # 2. Скачиваем фиолетовую иконку
+          mkdir -p assets
+          curl -L "https://ui-avatars.com/api/?name=A&background=6B21A8&color=fff&size=512&bold=true" -o assets/icon.png
+
+          # 3. Удаляем папку с адаптивными XML-роботами, чтобы они не мешали PNG-иконкам
+          rm -rf android/app/src/main/res/mipmap-anydpi-v26
+
+          # 4. Раскладываем фиолетовую иконку по всем папкам разрешений
+          MIPMAP_DIRS=("mipmap-mdpi" "mipmap-hdpi" "mipmap-xhdpi" "mipmap-xxhdpi" "mipmap-xxxhdpi")
+          for dir in "${MIPMAP_DIRS[@]}"; do
+            mkdir -p android/app/src/main/res/$dir
+            cp assets/icon.png android/app/src/main/res/$dir/ic_launcher.png
+            cp assets/icon.png android/app/src/main/res/$dir/ic_launcher_round.png
+          done
+
+          # 5. ИСПРАВЛЕНИЕ: Переключаем AndroidManifest на использование обычных PNG-иконок вместо XML
+          MANIFEST_PATH="android/app/src/main/AndroidManifest.xml"
+          sed -i '' 's/android:icon="@mipmap\/ic_launcher"/android:icon="@mipmap\/ic_launcher"/g' $MANIFEST_PATH 2>/dev/null || sed -i 's/android:icon="@mipmap\/ic_launcher"/android:icon="@mipmap\/ic_launcher"/g' $MANIFEST_PATH
+          sed -i '' 's/android:roundIcon="@mipmap\/ic_launcher_round"/android:roundIcon="@mipmap\/ic_launcher_round"/g' $MANIFEST_PATH 2>/dev/null || sed -i 's/android:roundIcon="@mipmap\/ic_launcher_round"/android:roundIcon="@mipmap\/ic_launcher_round"/g' $MANIFEST_PATH
+
+          echo "✅ Фиолетовая иконка успешно настроена и манифест обновлен!"
       - name: Build Debug APK
         script: |
           cd android
