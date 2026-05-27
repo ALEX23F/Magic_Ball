@@ -2,13 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Магический Шар: Рунический Вихрь</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Магический Шар</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            /* Базовый темный фон */
             background-color: #000;
             background-image: radial-gradient(circle at center, #1b0c3d 0%, #000000 80%);
             height: 100vh;
@@ -16,30 +15,29 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Georgia', serif;
+            font-family: 'Arial', sans-serif;
             color: white;
             overflow: hidden;
             position: relative;
         }
 
-        /* ХОЛСТ ДЛЯ РУН (За шаром) */
         #magicCanvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1; /* Под шаром */
-            pointer-events: none; /* Чтобы клики проходили сквозь него */
+            z-index: 1;
+            pointer-events: none;
         }
 
-        /* ОБЪЕКТ ШАРА */
         .ball-container {
             position: relative;
-            z-index: 10; /* Над рунами */
+            z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .ball {
@@ -48,57 +46,43 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 -10px 15px rgba(0,0,0,0.7), 0 0 30px rgba(168, 85, 247, 0.15);
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; position: relative;
-            -webkit-tap-highlight-color: transparent; 
             outline: none;
-            transition: all 0.2s ease-out;
-            animation: magicIdle 4s infinite ease-in-out;
-        }
-
-        @keyframes magicIdle {
-            0%, 100% { box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 -10px 15px rgba(0,0,0,0.7), 0 0 20px rgba(168, 85, 247, 0.15); }
-            50% { box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 -10px 15px rgba(0,0,0,0.7), 0 0 35px rgba(168, 85, 247, 0.35); }
         }
 
         .ball:active {
             transform: scale(0.96);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 -5px 10px rgba(0,0,0,0.6), 0 0 40px rgba(168, 85, 247, 0.5);
         }
 
-        /* Мягкое ПЛАВНОЕ покачивание (как мы докрутили) */
+        /* Мягкое плавное покачивание */
         @keyframes magicSway {
             0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-3px, 2px) rotate(-2deg); }
-            40% { transform: translate(3px, -3px) rotate(3deg); }
-            60% { transform: translate(-4px, -1px) rotate(-3deg); }
-            80% { transform: translate(3px, 3px) rotate(2deg); }
+            20% { transform: translate(-4px, 2px) rotate(-2deg); }
+            40% { transform: translate(4px, -3px) rotate(3deg); }
+            60% { transform: translate(-5px, -1px) rotate(-3deg); }
+            80% { transform: translate(4px, 3px) rotate(2deg); }
             100% { transform: translate(0, 0) rotate(0deg); }
         }
         
         .shaking .ball { 
-            animation: magicSway 0.9s ease-in-out infinite !important; 
+            animation: magicSway 0.9s ease-in-out infinite; 
         }
 
-        /* Окно с ответом */
+        /* Окно с ответом (без CSS переходов прозрачности, управляем из JS) */
         .window {
-            width: 130px; height: 130px; border-radius: 50%;
+            width: 140px; height: 140px; border-radius: 50%;
             background: radial-gradient(circle, #102a6b, #000 95%);
-            border: 3px solid rgba(168, 85, 247, 0.25);
-            display: flex; justify-content: center; align-items: center;
-            text-align: center; color: rgba(255, 255, 255, 0.95); font-size: 16px; font-weight: bold;
-            padding: 12px; box-shadow: inset 0 0 20px #000; text-shadow: 0 0 5px #fff;
+            border: 3px solid rgba(168, 85, 247, 0.4);
+            display: none; /* Изначально полностью выключено */
+            justify-content: center; align-items: center;
+            text-align: center; color: #fff; font-size: 16px; font-weight: bold;
+            padding: 12px; box-shadow: inset 0 0 20px #000, 0 0 15px rgba(168, 85, 247, 0.2);
+            text-shadow: 0 0 5px #fff;
             position: relative;
-            opacity: 0.1; /* Скрыто в простое */
-            transition: all 0.6s ease-in-out;
+            transition: opacity 0.4s ease;
+            opacity: 0;
         }
 
-        .active .window {
-            opacity: 1;
-            border-color: rgba(168, 85, 247, 0.6);
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.9), 0 0 15px rgba(168, 85, 247, 0.2);
-        }
-
-        /* Подсказка внизу */
-        .hint { margin-top: 40px; color: #4b5563; font-size: 13px; font-weight: normal; font-family: 'Arial', sans-serif; letter-spacing: 1px; z-index: 10;}
+        .hint { margin-top: 40px; color: #4b5563; font-size: 13px; letter-spacing: 1px; z-index: 10; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -111,20 +95,18 @@
         </div>
     </div>
     
-    <div class="hint">Коснись, чтобы запустить вихрь...</div>
+    <div class="hint">Коснись, чтобы узнать судьбу...</div>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            // --- 1. СКРИПТ АНИМАЦИИ ХАОТИЧНЫХ РУН (CANVAS) ---
+            // --- 1. ДВИЖОК ЛЕТАЮЩИХ РУН ---
             const canvas = document.getElementById('magicCanvas');
-            const ctx = canvas.getContext('ctx_magic');
+            const ctx = canvas.getContext('2d');
             let runesArray = [];
-            const runesCount = 50; // Количество летающих рун
-            // Список аутентичных скандинавских рун
+            const runesCount = 40; 
             const runicAlphabet = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚻᛁᛃᛇᛈᛉᛊᛋᛏᛒᛖᛗᛚᛜᛝᛟᛞ';
 
-            // Настройка размера Canvas
             function resizeCanvas() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -132,114 +114,59 @@
             window.addEventListener('resize', resizeCanvas);
             resizeCanvas();
 
-            // Объект "Частица-Руна"
             class Rune {
-                constructor() {
-                    this.init();
-                }
-
-                init() {
-                    // Случайное место появления по всему экрану
+                constructor() { this.init(true); }
+                init(isFirstTime = false) {
                     this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    // Случайный выбор символа
+                    this.y = isFirstTime ? (Math.random() * canvas.height) : (Math.random() < 0.5 ? 0 : canvas.height);
                     this.symbol = runicAlphabet[Math.floor(Math.random() * runicAlphabet.length)];
-                    // Хаотичная скорость (каждая руна летит со своей скоростью в разные стороны)
-                    this.speedX = (Math.random() - 0.5) * 1.5; // От -0.75 до 0.75
-                    this.speedY = (Math.random() - 0.5) * 1.5;
-                    // Система затухания и появления
-                    this.alpha = 0; // Прозрачность (0 - не видна)
-                    this.targetAlpha = 0; // Целевая прозрачность
-                    this.state = 0; // Состояние: 0-скрыта, 1-появляется, 2-светится, 3-затухает
-                    this.size = 18 + Math.random() * 8; // Случайный размер 18-26
-                    this.timer = 0; // Таймер фаз
+                    this.speedX = (Math.random() - 0.5) * 1.0; 
+                    this.speedY = (Math.random() - 0.5) * 1.0;
+                    this.alpha = 0; 
+                    this.maxAlpha = 0.3 + Math.random() * 0.5;
+                    this.state = 1;
+                    this.size = 20 + Math.random() * 6;
+                    this.lifetime = 200 + Math.random() * 200;
                 }
-
-                // Логика движения и затухания
                 update() {
-                    // 1. Полет (хаотичное движение)
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-
-                    // Отскок от краев экрана
+                    this.x += this.speedX; this.y += this.speedY;
                     if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
                     if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
 
-                    // 2. Система Фаз Затухания/Появления (Автомат состояний)
-                    this.timer++;
-
-                    switch (this.state) {
-                        case 0: // Скрыта, ждем перерождения
-                            this.timer = 0;
-                            if (Math.random() < 0.01) { // 1% шанс переродиться каждый кадр
-                                this.init();
-                                this.targetAlpha = 0.5 + Math.random() * 0.4; // 0.5 - 0.9 яркая
-                                this.state = 1; // Переход к появлению
-                            }
-                            break;
-                        case 1: // Плавно появляется (fade-in)
-                            this.alpha += 0.01;
-                            if (this.alpha >= this.targetAlpha) {
-                                this.alpha = this.targetAlpha;
-                                this.state = 2; // Переход к свечению
-                                this.timer = 0;
-                            }
-                            break;
-                        case 2: // Светится (свечение 3-7 секунд)
-                            if (this.timer > (180 + Math.random() * 240)) { // 3-7 секунд при 60fps
-                                this.state = 3; // Переход к затуханию
-                            }
-                            break;
-                        case 3: // Плавно затухает (fade-out)
-                            this.alpha -= 0.015; // Чуть быстрее гаснет
-                            if (this.alpha <= 0) {
-                                this.alpha = 0;
-                                this.state = 0; // Возврат к скрытому состоянию
-                            }
-                            break;
+                    if (this.state === 1) {
+                        this.alpha += 0.01; if (this.alpha >= this.maxAlpha) this.state = 2;
+                    } else if (this.state === 2) {
+                        this.lifetime--; if (this.lifetime <= 0) this.state = 3;
+                    } else if (this.state === 3) {
+                        this.alpha -= 0.01; if (this.alpha <= 0) this.init(false);
                     }
                 }
-
-                // Отрисовка на Canvas
                 draw() {
-                    if (this.state === 0) return; // Не рисуем, если скрыта
-
-                    ctx.fillStyle = `rgba(168, 85, 247, ${this.alpha})`; // Фиолетовый неон
-                    ctx.font = `${this.size}px Arial`;
-                    ctx.shadowBlur = 15; // Мощный неоновый эффект
-                    ctx.shadowColor = 'rgba(168, 85, 247, 0.7)';
+                    if (this.alpha <= 0) return;
+                    ctx.save();
+                    ctx.fillStyle = `rgba(168, 85, 247, ${this.alpha})`;
+                    ctx.font = `bold ${this.size}px Arial`;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = 'rgba(168, 85, 247, 0.6)';
                     ctx.fillText(this.symbol, this.x, this.y);
-                    ctx.shadowBlur = 0; // Сброс тени
+                    ctx.restore();
                 }
             }
 
-            // Создаем массив рун
             function initRunes() {
-                for (let i = 0; i < runesCount; i++) {
-                    runesArray.push(new Rune());
-                }
+                for (let i = 0; i < runesCount; i++) runesArray.push(new Rune());
             }
-
-            // Главный цикл анимации
             function animateRunes() {
-                // Очистка холста каждый кадр (мягкий fade для плавности)
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Отрисовка каждой руны
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 for (let i = 0; i < runesArray.length; i++) {
-                    runesArray[i].update();
-                    runesArray[i].draw();
+                    runesArray[i].update(); runesArray[i].draw();
                 }
                 requestAnimationFrame(animateRunes);
             }
-
-            // Запуск движка рун
-            initRunes();
-            animateRunes();
+            initRunes(); animateRunes();
 
 
-            // --- 2. СКРИПТ МАГИЧЕСКОГО ШАРА (РАБОЧИЙ) ---
+            // --- 2. ИСПРАВЛЕННАЯ ЛОГИКА ШАРА ---
             const answers = [
                 "Бесспорно!", "Это определённо так.", "Никаких сомнений.", "Можешь быть уверен.",
                 "Наверняка.", "Хорошие перспективы.", "Знаки говорят — да.", "Да.",
@@ -253,32 +180,36 @@
             const answerBox = document.getElementById('answer');
             let isThinking = false;
             
-            // Запускаем качание и ответ
             ballContainer.addEventListener('click', function() {
                 if (isThinking) return;
                 isThinking = true;
                 
-                // Включаем тряску и гасим окно
+                // 1. Включаем качание
                 ballContainer.classList.add('shaking');
-                ballContainer.classList.remove('active');
-                answerBox.style.opacity = '0'; // Плавно гасим старый ответ
                 
-                // Эффект вибрации на старте
-                if (navigator.vibrate) navigator.vibrate([150, 70, 150]);
+                // 2. Жестко прячем окно с текстом на время размышления
+                answerBox.style.opacity = '0';
+                answerBox.style.display = 'none';
                 
-                // Имитация "размышления" (2.5 секунды, как докрутили)
+                if (navigator.vibrate) navigator.vibrate([150, 50, 150]);
+                
+                // Ждем 2.5 секунды
                 setTimeout(() => {
-                    // Останавливаем тряску
+                    // 3. Останавливаем качание
                     ballContainer.classList.remove('shaking');
                     
-                    // Выбираем случайный ответ
+                    // 4. Записываем новый случайный ответ
                     const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
                     answerBox.textContent = randomAnswer;
                     
-                    // Плавно проявляем новый ответ из темноты
-                    ballContainer.classList.add('active');
+                    // 5. Включаем отображение элемента в документе
+                    answerBox.style.display = 'flex';
                     
-                    // Короткая финальная вибрация — ответ готов!
+                    // 6. Делаем микро-задержку, чтобы мобильный браузер успел понять, что элемент появился, и включил анимацию прозрачности
+                    setTimeout(() => {
+                        answerBox.style.opacity = '1';
+                    }, 50);
+                    
                     if (navigator.vibrate) navigator.vibrate(200);
                     
                     isThinking = false;
