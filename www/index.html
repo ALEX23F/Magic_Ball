@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Магический Шар Судьбы</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -10,66 +10,156 @@
         body {
             background-color: #000;
             background-image: 
-                radial-gradient(circle at center, #2b1055 0%, #000 70%),
-                radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.1), transparent 40%);
+                radial-gradient(circle at center, #2b1055 0%, #000 80%),
+                radial-gradient(circle at top left, rgba(168, 85, 247, 0.05), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.05), transparent 30%);
             height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Georgia', serif;
             color: white;
             overflow: hidden;
             position: relative;
         }
 
-        /* Руны на фоне */
+        /* Тонкие, мистические руны на фоне */
         body::before {
-            content: '';
+            content: 'ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚻ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛋ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛝ ᛟ ᛞ';
             position: absolute;
             bottom: 5%;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            height: 25%;
-            background-image: 
-                linear-gradient(90deg, rgba(168, 85, 247, 0.1) 1px, transparent 1px) 0 0 / 60px 100%,
-                radial-gradient(circle at center, rgba(168, 85, 247, 0.05) 10%, transparent 40%),
-                linear-gradient(90deg, transparent 50%, rgba(168, 85, 247, 0.1) 50%, rgba(168, 85, 247, 0.1) 60%, transparent 60%) 10px 10px / 40px 40px no-repeat,
-                linear-gradient(rgba(168, 85, 247, 0.1) 10%, transparent 10%, transparent 90%, rgba(168, 85, 247, 0.1) 90%) 30px 30px / 20px 20px no-repeat,
-                linear-gradient(45deg, rgba(168, 85, 247, 0.1) 50%, transparent 50%) 60px 60px / 20px 20px no-repeat;
-            background-repeat: repeat-x;
-            opacity: 0.6;
-            filter: blur(1px);
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            color: rgba(168, 85, 247, 0.05);
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 12px;
+            text-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
+            opacity: 0.8;
+            filter: blur(0.5px);
+            pointer-events: none;
         }
 
         .ball {
-            width: 300px; height: 300px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #444, #000);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 -10px 20px rgba(0,0,0,0.5);
+            width: 280px; height: 280px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #555, #000);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 -10px 15px rgba(0,0,0,0.7), 0 0 20px rgba(168, 85, 247, 0.1);
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; position: relative;
+            /* Исправление: удаляем любое выделение при клике */
             -webkit-tap-highlight-color: transparent; 
             outline: none;
-            /* Плавный переход для эффекта нажатия */
-            transition: box-shadow 0.3s ease; 
+            transition: all 0.2s ease-out;
+            animation: magicIdle 4s infinite ease-in-out;
+        }
+
+        @keyframes magicIdle {
+            0%, 100% { box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 -10px 15px rgba(0,0,0,0.7), 0 0 20px rgba(168, 85, 247, 0.1); }
+            50% { box-shadow: 0 15px 40px rgba(0,0,0,0.9), inset 0 -10px 15px rgba(0,0,0,0.7), 0 0 30px rgba(168, 85, 247, 0.25); }
         }
 
         .ball:active {
-            box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 -5px 15px rgba(0,0,0,0.6), 0 0 40px rgba(168, 85, 247, 0.4);
+            transform: scale(0.97);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.9), inset 0 -5px 10px rgba(0,0,0,0.6), 0 0 30px rgba(168, 85, 247, 0.3);
         }
 
         .window {
-            width: 140px; height: 140px; border-radius: 50%;
-            background: radial-gradient(circle, #1e3a8a, #0f172a);
-            border: 4px solid #334155;
+            width: 130px; height: 130px; border-radius: 50%;
+            background: radial-gradient(circle, #102a6b, #000 90%);
+            border: 3px solid rgba(168, 85, 247, 0.2);
             display: flex; justify-content: center; align-items: center;
-            text-align: center; color: #fff; font-size: 18px; font-weight: bold;
-            padding: 15px; box-shadow: inset 0 0 20px #000; text-shadow: 0 0 5px #fff;
+            text-align: center; color: rgba(255, 255, 255, 0.9); font-size: 16px; font-weight: normal;
+            padding: 12px; box-shadow: inset 0 0 15px #000; text-shadow: 0 0 4px #fff;
             position: relative;
-            /* Плавное проявление текста */
-            transition: opacity 0.6s ease-in-out; 
+            opacity: 0.1;
+            transition: all 0.5s ease;
         }
 
-        .ball:active .window {
-            border-color: #a855f
+        .active .window {
+            opacity: 1;
+            border-color: rgba(168, 85, 247, 0.4);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.9), 0 0 10px rgba(168, 85, 247, 0.1);
+        }
+
+        @keyframes shake {
+            0% { transform: translate(0, 0) rotate(0); }
+            20% { transform: translate(-3px, -2px) rotate(-1deg); }
+            40% { transform: translate(3px, 2px) rotate(1deg); }
+            60% { transform: translate(-3px, 2px) rotate(-1deg); }
+            80% { transform: translate(3px, -2px) rotate(1deg); }
+            100% { transform: translate(0, 0) rotate(0); }
+        }
+
+        .shaking { animation: shake 0.5s ease-in-out infinite; }
+        
+        .answer-appear { animation: appear 0.5s ease-out; }
+        @keyframes appear { from { opacity: 0; } to { opacity: 1; } }
+
+        .hint { margin-top: 30px; color: #444; font-size: 12px; font-weight: normal; font-family: 'Arial', sans-serif; letter-spacing: 1px;}
+    </style>
+</head>
+<body>
+    <div class="ball" id="magicBall">
+        <div class="window" id="answer"></div>
+    </div>
+    <div class="hint">Сосредоточься и нажми...</div>
+    
+    <script>
+        // Гарантируем запуск после полной загрузки
+        document.addEventListener('DOMContentLoaded', function() {
+            const answers = [
+                "Бесспорно!", "Это определённо так.", "Никаких сомнений.", "Можешь быть уверен.",
+                "Наверняка.", "Хорошие перспективы.", "Знаки говорят — да.", "Да.",
+                "Пока не ясно, попробуй снова.", "Спроси позже.", "Лучше не рассказывать.",
+                "Сейчас нельзя предсказать.", "Сконцентрируйся и спроси опять.",
+                "Даже не думай.", "Мой ответ — нет.", "По моим данным — нет.",
+                "Перспективы не очень.", "Весьма сомнительно.", "Звёзды молчат."
+            ];
+            
+            const ball = document.getElementById('magicBall');
+            const answerBox = document.getElementById('answer');
+            let isThinking = false;
+            
+            // Основная функция предсказания
+            window.predict = function() {
+                if (isThinking) return;
+                isThinking = true;
+                
+                // Эффект вибрации для смартфонов
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                
+                // Включаем тряску и гасим окно
+                ball.classList.add('shaking');
+                ball.classList.remove('active');
+                answerBox.innerHTML = '';
+                
+                // Имитация "размышления" (1.5 секунды)
+                setTimeout(() => {
+                    // Выбираем ответ
+                    const randomAnswer = answers[Math.floor(Math.random() * answers.length)];
+                    
+                    // Показываем ответ и останавливаем тряску
+                    ball.classList.remove('shaking');
+                    ball.classList.add('active');
+                    answerBox.innerHTML = `<span>${randomAnswer}</span>`;
+                    answerBox.classList.add('answer-appear');
+                    
+                    // Короткая вибрация — ответ готов
+                    if (navigator.vibrate) navigator.vibrate(150);
+                    
+                    // Удаляем класс анимации, чтобы она могла сработать снова
+                    setTimeout(() => answerBox.classList.remove('answer-appear'), 500);
+                    
+                    isThinking = false;
+                }, 1500); 
+            };
+            
+            // Назначаем обработчик на клик
+            ball.addEventListener('click', predict);
+        });
+    </script>
+</body>
+</html>
